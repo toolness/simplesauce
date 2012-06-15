@@ -17,7 +17,7 @@ const DEFAULT_AUTOMATION = {
 
 app.use(express.bodyParser());
 app.post(config.postReceiveEndpoint, function(req, res) {
-  var info = req.body.payload;
+  var info = JSON.parse(req.body.payload);
   var account = info.repository.owner.name;
   var name = info.repository.name;
   var commit = info.after;

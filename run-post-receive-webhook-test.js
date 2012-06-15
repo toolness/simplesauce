@@ -36,7 +36,7 @@ app.autoListen(function() {
 });
 
 // Based on https://help.github.com/articles/post-receive-hooks
-var githubPayload = {
+var githubPayload = {payload: {
   "before": "f3a0d8e1eee22ce850f2b01e2696d8c53f9abddc",
   "repository": {
     "url": "http://github.com/toolness/slowparse",
@@ -75,4 +75,4 @@ var githubPayload = {
   ],
   "after": "cb46ad1113726c656b1f78cc226f975a389bf86a",
   "ref": "refs/heads/gh-pages"
-};
+}};

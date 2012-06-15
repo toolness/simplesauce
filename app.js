@@ -3,7 +3,7 @@ var webdriverUtils = require('./webdriver-utils'),
     fs = require('fs'),
     os = require('os'),
     config = require('./config'),
-    tarball = require('./tarball'),
+    git = require('./git'),
     app = express.createServer(),
     staticFilesDir = __dirname + '/static';
 
@@ -21,15 +21,14 @@ app.post(config.postReceiveEndpoint, function(req, res) {
   var account = info.repository.owner.name;
   var name = info.repository.name;
   var commit = info.after;
-  var tarballURL = "https://github.com/" + account + "/" + name +
-                   "/tarball/" + commit;
-
-  console.log("extracting tarball", tarballURL);
-  tarball.extract(tarballURL, staticFilesDir, function(err) {
-    var subdirname = account + '-' + name + '-' + commit.slice(0, 7);
-    var jsonFilename = staticFilesDir + '/' + subdirname +
-                       '/test/automation.json';
-    console.log('tarball retrieved, running tests on', subdirname);
+  var gitURL = 'git://github.com/' + account + '/' + name + '.git';
+  var subdirname = account + '-' + name + '-' + commit;
+  var subdirpath = staticFilesDir + '/' + subdirname;
+  
+  console.log("cloning git repository", gitURL);
+  git.clone(gitURL, subdirpath, commit, function(err) {
+    var jsonFilename = subdirpath + '/test/automation.json';
+    console.log('repository cloned, running tests on', subdirname);
     if (!err) {
       var automation;
       try {
@@ -61,7 +60,7 @@ app.post(config.postReceiveEndpoint, function(req, res) {
       res.send('started tests on ' + automation.capabilities.length +
                ' browser(s).');
     } else {
-      res.send('could not retrieve tarball at ' + tarballURL, 400);
+      res.send('could not clone git repository at ' + gitURL, 400);
     }
   });
 });

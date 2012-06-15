@@ -55,8 +55,7 @@ app.post(config.postReceiveEndpoint, function(req, res) {
           capabilities: desired
         });
         webdriverUtils.runTests(subdirname, desired, function(err, result) {
-          if (!err)
-            app.emit('webdriver-session-finished', result);
+          app.emit('webdriver-session-finished', result);
         });
       });
       res.send('started tests on ' + automation.capabilities.length +

@@ -3,17 +3,23 @@
 <title>Simplesauce Log</title>
 <style>
 body {
-  font-family: Georgia, serif;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
   max-width: 640px;
   margin: 0 auto;
-}
-
-h1 {
-  font-weight: normal;
+  background: #f0f0f0;
+  font-size: 14px;
 }
 
 a {
   color: inherit;
+}
+
+.pass a:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.fail a:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .job {
@@ -26,7 +32,6 @@ a {
 .fail {
   background: firebrick;
   color: white;
-  border-radius: 12px;
 }
 
 a.more {
@@ -36,9 +41,8 @@ a.more {
   font-size: 10px;
   margin-left: 1em;
   padding: 2px 6px;
-  background: rgba(0, 0, 0, 0.5);
+  background: #555555;
   color: white;
-  border-radius: 6px;
 }
 
 a.more:hover {
@@ -50,7 +54,6 @@ a.more:hover {
   margin-top: 4px;
   padding: 4px;
   font-size: 12px;
-  border-radius: 6px;
 }
 
 .failure-reason:before {
@@ -129,6 +132,7 @@ var TEST_DATA = {
       }
     },
     {
+      sessionURL: "https://saucelabs.com/jobs/blah",
       result: {
         passed: 503,
         failed: 0,

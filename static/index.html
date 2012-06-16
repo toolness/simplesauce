@@ -14,6 +14,22 @@ a {
   color: inherit;
 }
 
+.job.browser-iexplore {
+  background-image: url(img/64-ie.png);
+}
+
+.job.browser-firefox {
+  background-image: url(img/64-firefox.png);
+}
+
+.job.browser-chrome {
+  background-image: url(img/64-chrome.png);
+}
+
+.job.browser-opera {
+  background-image: url(img/Opera_48x48.png);
+}
+
 .pass a:hover {
   background: rgba(0, 0, 0, 0.2);
 }
@@ -23,14 +39,18 @@ a {
 }
 
 .job {
-  padding: 10px;
+  padding: 10px 10px 10px 64px;
+  min-height: 36px;
+  background-size: 48px 48px;
+  background-position: 8px 50%;
+  background-repeat: no-repeat;
 }
 
 .pass {
 }
 
 .fail {
-  background: firebrick;
+  background-color: firebrick;
   color: white;
 }
 
@@ -39,7 +59,6 @@ a.more {
   vertical-align: bottom;
   text-decoration: none;
   font-size: 10px;
-  margin-left: 1em;
   padding: 2px 6px;
   background: #555555;
   color: white;
@@ -65,6 +84,13 @@ a.more:hover {
 <div id="jobs"></div>
 <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 <script>
+var BROWSER_NAMES = {
+  iexplore: "Internet Explorer",
+  opera: "Opera",
+  firefox: "Firefox",
+  chrome: "Chrome"
+};
+
 function text(string) {
   return $(document.createTextNode(string));
 }
@@ -72,11 +98,12 @@ function text(string) {
 function showLog(log) {
   log.entries.forEach(function(entry) {
     var div = $('<div class="job"></div>').appendTo("#jobs");
-    if (entry.capabilities.passed)
+    var caps = entry.capabilities;
+    if (caps.passed)
       div.addClass("pass");
     else
       div.addClass("fail");
-    var data = entry.capabilities['custom-data'];
+    var data = caps['custom-data'];
     var shortname = data.repository.split("github.com/")[1];
     
     text("In ").appendTo(div);
@@ -95,15 +122,17 @@ function showLog(log) {
     }
     text(" on ").appendTo(div);
     $('<span class="browser"></span>')
-      .text(entry.capabilities.browserName)
+      .text(BROWSER_NAMES[caps.browserName] +
+            (caps.version ? ' ' + caps.version : ''))
       .appendTo(div);
-    text(".").appendTo(div);
+    div.addClass("browser-" + caps.browserName);
+    text(". ").appendTo(div);
     if (entry.sessionURL) {
       $('<a class="more">more&hellip;</a>')
         .attr("href", entry.sessionURL)
         .appendTo(div);
     }
-    if (!entry.capabilities.passed && data.failureReason) {
+    if (!caps.passed && data.failureReason) {
       $('<div class="failure-reason"></div>')
         .text(data.failureReason)
         .appendTo(div);
@@ -113,8 +142,10 @@ function showLog(log) {
 }
 
 $(window).ready(function() {
-  jQuery.get("log.json", showLog);
-  //showLog(TEST_DATA);
+  if (window.location.search == "?sampledata=1")
+    showLog(TEST_DATA);
+  else
+    jQuery.get("log.json", showLog);
 });
 
 var TEST_DATA = {
@@ -140,7 +171,8 @@ var TEST_DATA = {
         runtime: 512
       },
       capabilities: {
-        browserName: "firefox",
+        browserName: "iexplore",
+        version: 9,
         passed: true,
         'custom-data': {
           repository: 'http://github.com/toolness/slowparse',
@@ -154,6 +186,24 @@ var TEST_DATA = {
       capabilities: {
         browserName: "opera",
         passed: false,
+        'custom-data': {
+          repository: 'http://github.com/toolness/slowparse',
+          commit: "cb46ad1113726c656b1f78cc226f975a389bf86a",
+          'tests-url': '/run-the-tests'
+        }
+      }
+    },
+    {
+      sessionURL: "https://saucelabs.com/jobs/blah",
+      result: {
+        passed: 503,
+        failed: 0,
+        total: 503,
+        runtime: 512
+      },
+      capabilities: {
+        browserName: "chrome",
+        passed: true,
         'custom-data': {
           repository: 'http://github.com/toolness/slowparse',
           commit: "cb46ad1113726c656b1f78cc226f975a389bf86a",

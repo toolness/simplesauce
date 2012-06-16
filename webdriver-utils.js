@@ -75,6 +75,8 @@ exports.runTests = function runTests(subdirname, desired, cb) {
   desired['custom-data']['tests-url'] = baseurl;
   
   browser.init(desired, function(err, sessionID) {
+    var sessionURL = null;
+    
     function fail(msg) {
       desired['custom-data'].failureReason = msg;
       desired.passed = false;
@@ -82,6 +84,7 @@ exports.runTests = function runTests(subdirname, desired, cb) {
         updateSauceJob(config.sauce, sessionID, desired);
       cb(msg, {
         sessionID: !err && sessionID,
+        sessionURL: sessionURL,
         capabilities: desired,
         result: null
       });
@@ -90,7 +93,10 @@ exports.runTests = function runTests(subdirname, desired, cb) {
     
     if (err)
       return fail("could not initialize session");
-    console.log("session ID is", sessionID);
+      
+    if (config.sauce)
+      sessionURL = 'https://saucelabs.com/jobs/' + sessionID;
+    console.log("session ID is", sessionID, "and URL is", sessionURL);
     browser.get(url, function(err) {
       if (err)
         return fail("could not load page at " + url);
@@ -110,6 +116,7 @@ exports.runTests = function runTests(subdirname, desired, cb) {
             updateSauceJob(config.sauce, sessionID, desired);
           cb(null, {
             sessionID: sessionID,
+            sessionURL: sessionURL,
             capabilities: desired,
             result: result
           });

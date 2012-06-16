@@ -20,8 +20,8 @@ var DEFAULT_AUTOMATION = {
 
 if (config.sauce)
   DEFAULT_AUTOMATION.capabilities.push({
-    browserName: 'iexplore' 
-    version: '9'
+    browserName: 'iexplore',
+    version: '9',
     platform: 'Windows 2008'
   }, {
     browserName: 'opera',

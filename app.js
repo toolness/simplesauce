@@ -22,7 +22,7 @@ app.post(config.postReceiveEndpoint, function(req, res) {
   var name = info.repository.name;
   var commit = info.after;
   var gitURL = 'git://github.com/' + account + '/' + name + '.git';
-  var subdirname = account + '-' + name + '-' + commit;
+  var subdirname = 'trees/' + account + '-' + name + '-' + commit;
   var subdirpath = staticFilesDir + '/' + subdirname;
   
   console.log("cloning git repository", gitURL);

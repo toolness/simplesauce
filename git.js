@@ -16,7 +16,8 @@ exports.clone = function(url, dirname, commit, cb) {
     setTimeout(cb, 0);
     return;
   }
-  var cmd = 'git clone ' + url + ' ' + dirname + ' && ' +
+  var cmd = 'mkdir -p ' + dirname + ' && ' +
+            'git clone ' + url + ' ' + dirname + ' && ' +
             'cd ' + dirname + ' && ' +
             'git checkout ' + commit + ' && ' +
             'git submodule update --init --recursive';

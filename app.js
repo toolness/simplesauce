@@ -65,6 +65,21 @@ app.post(config.postReceiveEndpoint, function(req, res) {
   });
 });
 
+app.on('webdriver-session-finished', function(info) {
+  var MAX_LOG_ENTRIES = 50;
+  var logfile = staticFilesDir + '/log.json';
+  var log;
+  try {
+    log = JSON.parse(fs.readFileSync(logfile));
+  } catch (e) {
+    log = {entries: []};
+  }
+  log.entries = log.entries.slice(0, MAX_LOG_ENTRIES);
+  info.timestamp = (new Date()).toString();
+  log.entries.unshift(info);
+  fs.writeFileSync(logfile, JSON.stringify(log));
+});
+
 app.get('/externalreporter.js', function(req, res) {
   res.send(webdriverUtils.getInjectionJS());
 });

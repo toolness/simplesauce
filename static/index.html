@@ -39,6 +39,12 @@ div.commit-info a:hover {
   text-decoration: underline;
 }
 
+div.commit-info time {
+  font-size: 12px;
+  padding-left: 1em;
+  text-transform: uppercase;
+}
+
 .job.browser-iexplore {
   background-image: url(img/64-ie.png);
 }
@@ -143,6 +149,9 @@ function showLog(log) {
         .text(shortcommit)
         .attr("href", data.repository + "/commit/" + data.commit)
         .appendTo(commitInfo);
+        
+      var timestamp = entry.timestamp.split("GMT")[0];
+      $('<time></time>').text(timestamp).appendTo(commitInfo);
     }
     var div = $('<div class="job"></div>').appendTo(commit);
     if (caps.passed)

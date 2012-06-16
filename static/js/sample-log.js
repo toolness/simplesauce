@@ -11,7 +11,8 @@ var SAMPLE_LOG = {
           'tests-url': '/run-the-tests',
           failureReason: 'could not initialize session'
         }
-      }
+      },
+      "timestamp":"Sat Jun 16 2012 16:02:42 GMT+0000 (UTC)"
     },
     {
       sessionURL: "https://saucelabs.com/jobs/blah",
@@ -30,7 +31,8 @@ var SAMPLE_LOG = {
           commit: "cb46ad1113726c656b1f78cc226f975a389bf86a",
           'tests-url': '/run-the-tests'
         }
-      }
+      },
+      "timestamp":"Sat Jun 16 2012 16:02:42 GMT+0000 (UTC)"
     },
     {
       sessionURL: "https://saucelabs.com/jobs/blah",
@@ -42,7 +44,8 @@ var SAMPLE_LOG = {
           commit: "cb46ad1113726c656b1f78cc226f975a389bf86a",
           'tests-url': '/run-the-tests'
         }
-      }
+      },
+      "timestamp":"Sat Jun 16 2012 16:02:42 GMT+0000 (UTC)"
     },
     {
       sessionURL: "https://saucelabs.com/jobs/blah",
@@ -60,7 +63,8 @@ var SAMPLE_LOG = {
           commit: "cb46ad1113726c656b1f78cc226f975a389bf86a",
           'tests-url': '/run-the-tests'
         }
-      }
+      },
+      "timestamp":"Sat Jun 16 2012 16:02:42 GMT+0000 (UTC)"
     }
   ]
 };

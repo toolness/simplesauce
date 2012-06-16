@@ -7,7 +7,7 @@ var webdriverUtils = require('./webdriver-utils'),
     app = express.createServer(),
     staticFilesDir = __dirname + '/static';
 
-const DEFAULT_AUTOMATION = {
+var DEFAULT_AUTOMATION = {
   "capabilities": [
     {
       "browserName": "firefox"
@@ -17,6 +17,16 @@ const DEFAULT_AUTOMATION = {
     }    
   ]
 };
+
+if (config.sauce)
+  DEFAULT_AUTOMATION.capabilities.push({
+    browserName: 'iexplore' 
+    version: '9'
+    platform: 'Windows 2008'
+  }, {
+    browserName: 'opera',
+    platform: 'LINUX'
+  });
 
 app.use(express.bodyParser());
 app.post(config.postReceiveEndpoint, function(req, res) {

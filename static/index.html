@@ -14,6 +14,31 @@ a {
   color: inherit;
 }
 
+div.commit {
+  padding-top: 20px;
+}
+
+div.commit:first-child {
+  padding-top: 0;
+}
+
+div.commit-info {
+  padding-bottom: 10px;
+  color: gray;
+  font-size: 18px;
+  padding-bottom: 10px;
+}
+
+div.commit-info a {
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+div.commit-info a:hover {
+  text-decoration: underline;
+}
+
 .job.browser-iexplore {
   background-image: url(img/64-ie.png);
 }
@@ -81,7 +106,7 @@ a.more:hover {
 }
 </style>
 <h1>Simplesauce Log</h1>
-<div id="jobs"></div>
+<div id="entries"></div>
 <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 <script>
 var BROWSER_NAMES = {
@@ -96,28 +121,40 @@ function text(string) {
 }
 
 function showLog(log) {
+  var commit = null;
   log.entries.forEach(function(entry) {
-    var div = $('<div class="job"></div>').appendTo("#jobs");
     var caps = entry.capabilities;
+    var data = caps['custom-data'];
+    var shortname = data.repository.split("github.com/")[1];
+    var shortcommit = data.commit.slice(0, 7);
+    var shortid = shortname + "@" + shortcommit;
+
+    if (!(commit && commit.attr("data-shortid") == shortid)) {
+      commit = $('<div class="commit"></div>')
+        .attr("data-shortid", shortid)
+        .appendTo("#entries");
+      var commitInfo = $('<div class="commit-info"></div>').appendTo(commit);
+      $('<a class="shortname"></a>')
+        .text(shortname)
+        .attr("href", data.repository)
+        .appendTo(commitInfo);
+      text(" @ ").appendTo(commitInfo);
+      $('<a class="shortcommit"></a>')
+        .text(shortcommit)
+        .attr("href", data.repository + "/commit/" + data.commit)
+        .appendTo(commitInfo);
+    }
+    var div = $('<div class="job"></div>').appendTo(commit);
     if (caps.passed)
       div.addClass("pass");
     else
       div.addClass("fail");
-    var data = caps['custom-data'];
-    var shortname = data.repository.split("github.com/")[1];
-    
-    text("In ").appendTo(div);
-    $('<a class="commit"></a>')
-      .text(shortname + "@" + data.commit.slice(0, 7))
-      .attr("href", data.repository + "/commit/" + data.commit)
-      .appendTo(div);
-    text(", ").appendTo(div);
     if (entry.result) {
       $('<span class="results">' + entry.result.passed + ' of ' +
         entry.result.total + ' <a class="tests">tests</a> pass in ' +
         entry.result.runtime + 'ms</span>').appendTo(div);
     } else {
-      $('<span><a class="tests">tests</a> fail</span>')
+      $('<span>All <a class="tests">tests</a> fail</span>')
         .appendTo(div);
     }
     text(" on ").appendTo(div);

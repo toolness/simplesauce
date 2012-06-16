@@ -92,8 +92,8 @@ function showLog(log) {
 }
 
 $(window).ready(function() {
-  //jQuery.get("log.json", showLog);
-  showLog(TEST_DATA);
+  jQuery.get("log.json", showLog);
+  //showLog(TEST_DATA);
 });
 
 var TEST_DATA = {

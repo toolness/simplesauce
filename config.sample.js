@@ -1,4 +1,4 @@
-module.exports = {
+var config = {
   // Only include this if you're integrating w/ saucelabs.
   sauce: {
     username: "your-saucelabs-username",
@@ -7,6 +7,9 @@ module.exports = {
   // Hostname and port to listen for github post-receive hooks on.
   hostname: "localhost",
   port: 8432,
+  // Base URL of the server; leave blank to auto-generate this, or
+  // specify it explicitly if the server is behind a reverse proxy.
+  baseURL: null,
   // Path to receive github post-receive hooks on. You can keep this
   // secret if you don't want other people issuing jobs to your server.
   postReceiveEndpoint: '/newjob',
@@ -20,3 +23,8 @@ module.exports = {
     "capture-html": true
   }
 };
+
+if (!config.baseURL)
+  config.baseURL = "http://" + config.hostname + ":" + config.port;
+
+module.exports = config;

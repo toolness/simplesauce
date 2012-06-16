@@ -7,11 +7,30 @@ var webdriverUtils = require('./webdriver-utils'),
     app = express.createServer(),
     staticFilesDir = __dirname + '/static';
 
-const DEFAULT_AUTOMATION = {
+const DEFAULT_AUTOMATION = config.sauce ? {
   "capabilities": [
     {
       "browserName": "firefox"
+    },
+    {
+      "browserName": "chrome"
+    },
+    {
+      "browserName": "opera"
+    },
+    {
+      "browserName": "iexplore", 
+      "version": "9"
     }
+  ]
+} : {
+  "capabilities": [
+    {
+      "browserName": "firefox"
+    },
+    {
+      "browserName": "chrome"
+    }    
   ]
 };
 

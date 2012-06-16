@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Simplesauce Log</title>
+<style>
+body {
+  font-family: Georgia, serif;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-weight: normal;
+}
+
+a {
+  color: inherit;
+}
+
+.job {
+  padding: 10px;
+}
+
+.pass {
+}
+
+.fail {
+  background: firebrick;
+  color: white;
+  border-radius: 12px;
+}
+
+a.more {
+  display: inline-block;
+  vertical-align: bottom;
+  text-decoration: none;
+  font-size: 10px;
+  margin-left: 1em;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border-radius: 6px;
+}
+
+a.more:hover {
+  background: black;
+}
+</style>
+<h1>Simplesauce Log</h1>
+<div id="jobs"></div>
+<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+<script>
+function text(string) {
+  return $(document.createTextNode(string));
+}
+
+function showLog(log) {
+  log.entries.forEach(function(entry) {
+    var div = $('<div class="job"></div>').appendTo("#jobs");
+    if (entry.capabilities.passed)
+      div.addClass("pass");
+    else
+      div.addClass("fail");
+    var data = entry.capabilities['custom-data'];
+    var shortname = data.repository.split("github.com/")[1];
+    
+    text("In ").appendTo(div);
+    $('<a class="commit"></a>')
+      .text(shortname + "@" + data.commit.slice(0, 7))
+      .attr("href", data.repository + "/commit/" + data.commit)
+      .appendTo(div);
+    text(", ").appendTo(div);
+    if (entry.result) {
+      $('<span class="results">' + entry.result.passed + ' of ' +
+        entry.result.total + ' <a class="tests">tests</a> pass in ' +
+        entry.result.runtime + 'ms</span>').appendTo(div);
+    } else {
+      $('<span><a class="tests">tests</a> fail</span>')
+        .appendTo(div);
+    }
+    text(" on ").appendTo(div);
+    $('<span class="browser"></span>')
+      .text(entry.capabilities.browserName)
+      .appendTo(div);
+    text(".").appendTo(div);
+    if (entry.sessionURL) {
+      $('<a class="more">more&hellip;</a>')
+        .attr("href", entry.sessionURL)
+        .appendTo(div);
+    }
+    div.find('a.tests').attr("href", data['tests-url']);
+  });
+}
+
+$(window).ready(function() {
+  //jQuery.get("log.json", showLog);
+  showLog(TEST_DATA);
+});
+
+var TEST_DATA = {
+  entries: [
+    {
+      capabilities: {
+        browserName: "firefox",
+        passed: false,
+        'custom-data': {
+          repository: 'http://github.com/toolness/slowparse',
+          commit: "cb46ad1113726c656b1f78cc226f975a389bf86a",
+          'tests-url': '/run-the-tests'
+        }
+      }
+    },
+    {
+      result: {
+        passed: 503,
+        failed: 0,
+        total: 503,
+        runtime: 512
+      },
+      capabilities: {
+        browserName: "firefox",
+        passed: true,
+        'custom-data': {
+          repository: 'http://github.com/toolness/slowparse',
+          commit: "cb46ad1113726c656b1f78cc226f975a389bf86a",
+          'tests-url': '/run-the-tests'
+        }
+      }
+    },
+    {
+      sessionURL: "https://saucelabs.com/jobs/blah",
+      capabilities: {
+        browserName: "opera",
+        passed: false,
+        'custom-data': {
+          repository: 'http://github.com/toolness/slowparse',
+          commit: "cb46ad1113726c656b1f78cc226f975a389bf86a",
+          'tests-url': '/run-the-tests'
+        }
+      }
+    }
+  ]
+};
+</script>

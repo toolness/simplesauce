@@ -23,9 +23,6 @@ if (config.sauce)
     browserName: 'iexplore',
     version: '9',
     platform: 'Windows 2008'
-  }, {
-    browserName: 'opera',
-    platform: 'LINUX'
   });
 
 app.use(express.bodyParser());

@@ -1,0 +1,13 @@
+{
+  "name": "simplesauce",
+  "description": "Simple webdriver/saucelabs CI for static HTML5 projects",
+  "version": "0.0.1",
+  "author": {
+    "name": "Atul Varma",
+    "email": "varmaa@gmail.com"
+  },
+  "dependencies": {
+    "express": "2.5.x",
+    "wd": "0.0.x"
+  }
+}

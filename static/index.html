@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<title>Simplesauce Log</title>
+<title>Simplesauce</title>
 <style>
 body {
   font-family: "Helvetica Neue", Helvetica, sans-serif;
@@ -110,9 +110,47 @@ a.more:hover {
   content: 'reason: ';
   font-weight: bold;
 }
+
+form label {
+  display: inline-block;
+  font-weight: bold;
+  width: 25%;
+}
+
+form input[type="text"] {
+  display: inline-block;
+  border: 1px dotted black;
+  margin-bottom: 10px;
+  padding: 2px;
+  width: 60%;
+}
+
+form input[type="submit"] {
+  border: none;
+  padding: 2px;
+  font-family: inherit;
+  cursor: pointer;
+  background: gray;
+  color: white;
+}
+
+form input[type="submit"]:hover {
+  background: black;
+  font-family: inherit;
+}
 </style>
-<h1>Simplesauce Log</h1>
-<p>There are <span class="active-jobs"></span> active jobs.</p>
+<h1>Simplesauce</h1>
+<p>
+  There are <span class="active-jobs"></span> active jobs.
+  <a href="#" id="show-submit-job-form">Submit one.</a>
+</p>
+<form id="submit-job" style="display: none">
+  <label for="commit-url">Commit URL:</label>
+  <input type="text" id="commit-url">
+  <label for="post-endpoint">Secret Key:</label>
+  <input type="text" id="post-endpoint">
+  <input type="submit" value="Submit Job">
+</form>
 <div id="entries"></div>
 <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 <script>
@@ -129,6 +167,8 @@ function text(string) {
 
 function showLog(log) {
   var commit = null;
+  
+  $("#entries").empty();
   log.entries.forEach(function(entry) {
     var caps = entry.capabilities;
     var data = caps['custom-data'];
@@ -188,16 +228,94 @@ function showLog(log) {
   });
 }
 
-$(window).ready(function() {
-  jQuery.getJSON('/status', function(info) {
-    var activeJobs = info.activeJobs == 0 ? "no" : info.activeJobs;
-    $(".active-jobs").text(activeJobs);
-  });
-  if (window.location.search == "?sampledata=1")
-    jQuery.getScript("js/sample-log.js", function() {
-      showLog(SAMPLE_LOG);
+$("#show-submit-job-form").click(function() {
+  $("#submit-job").slideDown();
+  return false;
+});
+
+$("#submit-job").submit(function() {
+  var commitRE = /^https?:\/\/github\.com\/(.+)\/(.+)\/commit\/([0-9a-f]+)$/;
+  try {
+    var commitURL = $("#commit-url").val();
+    var postEndpoint = $("#post-endpoint").val();
+    var match = commitURL.match(commitRE);
+
+    if (!match) {
+      alert("Invalid commit URL!");
+      return false;
+    }
+
+    var username = match[1];
+    var reponame = match[2];
+    var commit = match[3];
+
+    // Based on https://help.github.com/articles/post-receive-hooks
+    var githubPayload = {payload: JSON.stringify({
+      "repository": {
+        "url": "http://github.com/" + username + "/" + reponame,
+        "name": reponame,
+        "description": "manually submitted job",
+        "owner": {
+          "name": username
+        }
+      },
+      "commits": [],
+      "after": commit,
+      "ref": "refs/heads/UNKNOWN"
+    })};
+    jQuery.ajax({
+      type: 'POST',
+      url: postEndpoint,
+      data: JSON.stringify(githubPayload),
+      error: function() {
+        alert('Alas, an error occurred.');
+      },
+      success: function(data) {
+        if (window.console)
+          console.log(data);
+        refreshData();
+      },
+      dataType: 'text',
+      contentType: 'application/json'
     });
-  else
-    jQuery.get("log.json", showLog);
+    $(this).slideUp();
+  } catch (e) {
+    if (window.console)
+      console.error(e);
+  }
+  
+  return false;
+});
+
+$(window).ready(function() {
+  var REFRESH_DATA_INTERVAL = 60000;
+  var statusRequest = null;
+  var logRequest = null;
+
+  var refreshData = window.refreshData = function() {
+    if (statusRequest)
+      statusRequest.abort();
+    statusRequest = jQuery.getJSON('/status', function(info) {
+      statusRequest = null;
+      var activeJobs = info.activeJobs == 0 ? "no" : info.activeJobs;
+      $(".active-jobs").text(activeJobs);
+    });
+
+    if (logRequest)
+      logRequest.abort();
+    if (window.location.search == "?sampledata=1")
+      logRequest = jQuery.getScript("js/sample-log.js", function() {
+        logRequest = null;
+        showLog(SAMPLE_LOG);
+      });
+    else
+      logRequest = jQuery.get("log.json", function(log) {
+        logRequest = null;
+        showLog(log);
+      });
+  }
+
+  setInterval(refreshData, REFRESH_DATA_INTERVAL);
+  refreshData();
 });
 </script>

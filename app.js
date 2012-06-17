@@ -25,6 +25,8 @@ if (config.sauce)
     platform: 'Windows 2008'
   });
 
+app.activeJobs = 0;
+
 app.use(express.bodyParser());
 app.post(config.postReceiveEndpoint, function(req, res) {
   var info = JSON.parse(req.body.payload);
@@ -60,10 +62,12 @@ app.post(config.postReceiveEndpoint, function(req, res) {
         desired['custom-data'].repository = info.repository.url;
         desired['custom-data'].commit = commit;
         desired['custom-data'].branch = info.ref.split('/').reverse()[0];
+        app.activeJobs++;
         app.emit('webdriver-session-starting', {
           capabilities: desired
         });
         webdriverUtils.runTests(subdirname, desired, function(err, result) {
+          app.activeJobs--;
           app.emit('webdriver-session-finished', result);
         });
       });
@@ -88,6 +92,12 @@ app.on('webdriver-session-finished', function(info) {
   info.timestamp = (new Date()).toString();
   log.entries.unshift(info);
   fs.writeFileSync(logfile, JSON.stringify(log));
+});
+
+app.get('/status', function(req, res) {
+  res.send({
+    activeJobs: app.activeJobs
+  });
 });
 
 app.get('/externalreporter.js', function(req, res) {

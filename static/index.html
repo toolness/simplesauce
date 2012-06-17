@@ -112,6 +112,7 @@ a.more:hover {
 }
 </style>
 <h1>Simplesauce Log</h1>
+<p>There are <span class="active-jobs"></span> active jobs.</p>
 <div id="entries"></div>
 <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 <script>
@@ -188,6 +189,10 @@ function showLog(log) {
 }
 
 $(window).ready(function() {
+  jQuery.getJSON('/status', function(info) {
+    var activeJobs = info.activeJobs == 0 ? "no" : info.activeJobs;
+    $(".active-jobs").text(activeJobs);
+  });
   if (window.location.search == "?sampledata=1")
     jQuery.getScript("js/sample-log.js", function() {
       showLog(SAMPLE_LOG);

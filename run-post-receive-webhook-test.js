@@ -22,15 +22,10 @@ app.autoListen(function() {
   });
   req.write(payload);
   req.end();
-  
-  var sessionsLeft = 0;
-  
-  app.on('webdriver-session-starting', function() {
-    sessionsLeft++;
-  });
+
   app.on('webdriver-session-finished', function(info) {
     console.log("test finished", info);
-    if (--sessionsLeft == 0)
+    if (app.activeJobs == 0)
       app.close();
   });
 });

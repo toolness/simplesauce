@@ -1,5 +1,5 @@
-var app = require('./app'),
-    config = require('./config'),
+var app = require('../../app'),
+    config = require('../../config'),
     http = require('http');
 
 app.autoListen(function() {

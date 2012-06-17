@@ -1,6 +1,7 @@
 var app = require('../../app'),
     config = require('../../config'),
-    http = require('http');
+    http = require('http'),
+    assert = require('assert');
 
 app.autoListen(function() {
   var payload = JSON.stringify(githubPayload);
@@ -14,19 +15,23 @@ app.autoListen(function() {
     },
     method: 'POST'
   }, function(res) {
-    console.log('POST returned', res.statusCode);
+    assert.equal(res.statusCode, 200);
     res.setEncoding('utf8');
     res.on('data', function(data) {
-      console.log('POST response body: ' + data);
+      assert.equal(data.indexOf('started tests'), 0);
     });
   });
   req.write(payload);
   req.end();
 
   app.on('webdriver-session-finished', function(info) {
-    console.log("test finished", info);
-    if (app.activeJobs == 0)
+    assert.equal(info.result.passed, 503);
+    assert.equal(info.result.failed, 0);
+    //console.log("test finished", info);
+    if (app.activeJobs == 0) {
       app.close();
+      console.log("-- ALL TESTS PASSED, exiting.");
+    }
   });
 });
 

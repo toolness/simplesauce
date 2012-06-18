@@ -24,8 +24,8 @@ function say(msg) {
 app.on("job-submitted", function(info) {
   var shortname = info.account + "/" + info.name + "@" +
       info.commit.slice(0, 7);
-  say("tests for " + shortname +
-      " started on " + info.capabilities.length + " browsers. " +
+  say("tests for " + shortname + " (branch " + info.branch + ") " +
+      "started on " + info.capabilities.length + " browsers. " +
       "For detailed results, see " + config.baseURL + ".");
 });
 

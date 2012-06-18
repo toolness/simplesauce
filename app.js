@@ -36,6 +36,7 @@ app.post(config.postReceiveEndpoint, function(req, res) {
   var gitURL = 'git://github.com/' + account + '/' + name + '.git';
   var subdirname = 'trees/' + account + '-' + name + '-' + commit;
   var subdirpath = staticFilesDir + '/' + subdirname;
+  var branch = info.ref.split('/').reverse()[0];
   
   console.log("cloning git repository", gitURL);
   git.clone(gitURL, subdirpath, commit, function(err) {
@@ -49,6 +50,13 @@ app.post(config.postReceiveEndpoint, function(req, res) {
         console.log('retrieving test/automation.json failed, using default.');
         automation = JSON.parse(JSON.stringify(DEFAULT_AUTOMATION));
       }
+      app.emit('job-submitted', {
+        account: account,
+        name: name,
+        commit: commit,
+        branch: branch,
+        capabilities: automation.capabilities
+      });
       automation.capabilities.forEach(function(desired) {
         console.log('running tests on', JSON.stringify(desired));
         Object.keys(config.capabilities).forEach(function(name) {
@@ -61,7 +69,7 @@ app.post(config.postReceiveEndpoint, function(req, res) {
           desired['custom-data'] = {};
         desired['custom-data'].repository = info.repository.url;
         desired['custom-data'].commit = commit;
-        desired['custom-data'].branch = info.ref.split('/').reverse()[0];
+        desired['custom-data'].branch = branch;
         app.activeJobs++;
         app.emit('webdriver-session-starting', {
           capabilities: desired

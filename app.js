@@ -122,6 +122,12 @@ app.get('/externalreporter.js', function(req, res) {
   res.send(webdriverUtils.getInjectionJS());
 });
 
+app.use(function(req, res, next) {
+  if (req.url.indexOf('/log.json') == 0)
+    res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
+
 app.use(express.static(staticFilesDir));
 
 module.exports = app;

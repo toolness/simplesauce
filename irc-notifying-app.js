@@ -10,12 +10,17 @@ var BROWSER_NAMES = {
 };
 
 var client = new irc.Client(config.irc.server, config.irc.username, {
-    channels: [config.irc.channel]
+    channels: Object.keys(config.irc.channels)
 });
 
-function say(msg) {
+function say(name, msg) {
   try {
-    client.say(config.irc.channel, msg);
+    Object.keys(config.irc.channels).forEach(function(channel) {
+      config.irc.channels[channel].forEach(function(project) {
+        if (project == name)
+          client.say(channel, msg);
+      });
+    });
   } catch (e) {
     console.log("failed to broadcast on IRC: " + e);
   }
@@ -24,20 +29,22 @@ function say(msg) {
 app.on("job-submitted", function(info) {
   var shortname = info.account + "/" + info.name + "@" +
       info.commit.slice(0, 7);
-  say("tests for " + shortname + " (branch " + info.branch + ") " +
+  say(info.name,
+      "tests for " + shortname + " (branch " + info.branch + ") " +
       "started on " + info.capabilities.length + " browsers. " +
       "For detailed results, see " + config.baseURL + ".");
 });
 
 app.on("webdriver-session-finished", function(entry) {
   var caps = entry.capabilities;
+  var name = caps['custom-data'].repository.split('/').reverse()[0];
   var browserName = BROWSER_NAMES[caps.browserName] +
                     (caps.version ? ' ' + caps.version : '');
   if (entry.result) {
-    say(entry.result.passed + " of " + entry.result.total +
+    say(name, entry.result.passed + " of " + entry.result.total +
         " tests passed on " + browserName + ".");
   } else
-    say("All tests failed on " + browserName + ".");
+    say(name, "All tests failed on " + browserName + ".");
 });
 
 app.autoListen();

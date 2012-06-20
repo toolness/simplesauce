@@ -4,26 +4,31 @@ var webdriverUtils = require('./webdriver-utils'),
     os = require('os'),
     config = require('./config'),
     git = require('./git'),
+    _ = require('./underscore.js'),
     app = express.createServer(),
     staticFilesDir = __dirname + '/static';
 
-var DEFAULT_AUTOMATION = {
-  "capabilities": [
-    {
-      "browserName": "firefox"
-    },
-    {
-      "browserName": "chrome"
-    }    
-  ]
-};
-
-if (config.sauce)
-  DEFAULT_AUTOMATION.capabilities.push({
+var BROWSER_CAPS = {
+  firefox: {
+    "browserName": "firefox"
+  },
+  chrome: {
+    "browserName": "chrome"
+  },
+  ie9: {
     browserName: 'iexplore',
     version: '9',
     platform: 'Windows 2008'
-  });
+  }
+};
+
+var DEFAULT_PROJECT_CONFIG = {
+  browsers: ["firefox", "chrome"],
+  testPath: "/test/"
+};
+
+if (config.sauce)
+  DEFAULT_PROJECT_CONFIG.browsers.push("ie9");
 
 app.activeJobs = 0;
 
@@ -40,24 +45,30 @@ app.post(config.postReceiveEndpoint, function(req, res) {
   
   console.log("cloning git repository", gitURL);
   git.clone(gitURL, subdirpath, commit, function(err) {
-    var jsonFilename = subdirpath + '/test/automation.json';
+    var jsonFilename = subdirpath + '/.simplesauce.json';
     console.log('repository cloned, running tests on', subdirname);
     if (!err) {
-      var automation;
+      var projectConfig = _.clone(DEFAULT_PROJECT_CONFIG);
       try {
-        automation = JSON.parse(fs.readFileSync(jsonFilename));
+        _.extend(projectConfig, JSON.parse(fs.readFileSync(jsonFilename)));
       } catch (e) {
-        console.log('retrieving test/automation.json failed, using default.');
-        automation = JSON.parse(JSON.stringify(DEFAULT_AUTOMATION));
+        console.log('retrieving .simplesauce.json failed, using defaults.');
       }
+      var capabilities = [];
+      projectConfig.browsers.forEach(function(browser) {
+        if (browser in BROWSER_CAPS)
+          capabilities.push(_.clone(BROWSER_CAPS[browser]));
+        else
+          console.warn("browser '" + browser + "' is unknown.");
+      });
       app.emit('job-submitted', {
         account: account,
         name: name,
         commit: commit,
         branch: branch,
-        capabilities: automation.capabilities
+        capabilities: capabilities
       });
-      automation.capabilities.forEach(function(desired) {
+      capabilities.forEach(function(desired) {
         console.log('running tests on', JSON.stringify(desired));
         Object.keys(config.capabilities).forEach(function(name) {
           desired[name] = config.capabilities[name];
@@ -77,10 +88,9 @@ app.post(config.postReceiveEndpoint, function(req, res) {
         webdriverUtils.runTests(subdirname, desired, function(err, result) {
           app.activeJobs--;
           app.emit('webdriver-session-finished', result);
-        });
+        }, projectConfig.testPath);
       });
-      res.send('started tests on ' + automation.capabilities.length +
-               ' browser(s).');
+      res.send('started tests on ' + capabilities.length + ' browser(s).');
     } else {
       res.send('could not clone git repository at ' + gitURL, 400);
     }

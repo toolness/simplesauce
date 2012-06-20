@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Simplesauce Test Suite</title>
+    <link rel="stylesheet" href="qunit.css">
+  </head>
+
+  <body>
+    <h1  id="qunit-header">Simplesauce Test Suite</h1>
+    <h2  id="qunit-banner"></h2>
+    <div id="qunit-testrunner-toolbar"></div>
+    <h2  id="qunit-userAgent"></h2>
+    <ol  id="qunit-tests"></ol>
+    <div id="qunit-fixture"></div>
+
+    <script src="qunit.js"></script>
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/show-log.js"></script>
+    <script src="../js/sample-log.js"></script>
+    <script>
+    module("general");
+    
+    test("showLog() works", function() {
+      var entries = $("<div></div>");
+      showLog(SAMPLE_LOG, entries);
+      equal(entries.find(".job").length, SAMPLE_LOG.entries.length);
+    });
+    </script>
+    <script>
+    if (location.search.match(/externalreporter=1/))
+      document.write('<script src="/externalreporter.js"></' + 'script>');
+    </script>
+  </body>
+</html>

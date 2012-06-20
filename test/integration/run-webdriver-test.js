@@ -4,7 +4,7 @@ var config = require('../../config'),
     assert = require('assert');
 
 app.autoListen(function() {
-  var subdirname = 'trees/toolness-slowparse-cb46ad1113726c656b1f78cc226f975a389bf86a';
+  var subdirname = 'trees/toolness-simplesauce-94f0a5de33a459cab6af183a832327896d4d0f8f';
   var desired = {
     browserName:'chrome',
     tags: ["examples"],
@@ -26,18 +26,18 @@ app.autoListen(function() {
   
   webdriverUtils.runTests(subdirname, desired, function(err, info) {
     assert(!err);
-    assert.equal(info.result.passed, 503);
+    assert.equal(info.result.passed, 1);
     assert.equal(info.result.failed, 0);
     //console.log(err, result);
     maybeQuit();
-  });
+  }, "/static/test/");
   
   desired.browserName = 'firefox';
   webdriverUtils.runTests(subdirname, desired, function(err, info) {
     assert(!err);
-    assert.equal(info.result.passed, 503);
+    assert.equal(info.result.passed, 1);
     assert.equal(info.result.failed, 0);
     //console.log(err, result);
     maybeQuit();
-  });
+  }, "/static/test/");
 });

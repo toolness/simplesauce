@@ -25,7 +25,7 @@ app.autoListen(function() {
   req.end();
 
   app.on('webdriver-session-finished', function(info) {
-    assert.equal(info.result.passed, 503);
+    assert.equal(info.result.passed, 1);
     assert.equal(info.result.failed, 0);
     //console.log("test finished", info);
     if (app.activeJobs == 0) {
@@ -36,43 +36,4 @@ app.autoListen(function() {
 });
 
 // Based on https://help.github.com/articles/post-receive-hooks
-var githubPayload = {payload: JSON.stringify({
-  "before": "f3a0d8e1eee22ce850f2b01e2696d8c53f9abddc",
-  "repository": {
-    "url": "http://github.com/toolness/slowparse",
-    "name": "slowparse",
-    "description": "A slow JS-based HTML parser with good error feedback and debugging metadata.",
-    "watchers": 5,
-    "forks": 2,
-    "private": 1,
-    "owner": {
-      "email": "chris@ozmm.org",
-      "name": "toolness"
-    }
-  },
-  "commits": [
-    {
-      "id": "a33cce14c378cd9f78db3f6a4f9555a72931bfe2",
-      "url": "http://github.com/toolness/slowparse/commit/a33cce14c378cd9f78db3f6a4f9555a72931bfe2",
-      "author": {
-        "email": "chris@ozmm.org",
-        "name": "Chris Wanstrath"
-      },
-      "message": "Merge pull request #40 from Pomax/gh-pages ",
-      "timestamp": "2008-02-15T14:57:17-08:00",
-      "added": ["filepath.rb"]
-    },
-    {
-      "id": "cb46ad1113726c656b1f78cc226f975a389bf86a",
-      "url": "http://github.com/toolness/slowparse/commit/cb46ad1113726c656b1f78cc226f975a389bf86a",
-      "author": {
-        "email": "chris@ozmm.org",
-        "name": "Chris Wanstrath"
-      },
-      "message": "add optional external reporter script injection in test suite. ",
-      "timestamp": "2008-02-15T14:36:34-08:00"
-    }
-  ],
-  "after": "541d71ad6cfaceceb69b73b1cc473941eb5feded",
-  "ref": "refs/heads/gh-pages"
-})};
+var githubPayload = {payload: JSON.stringify({ "after": "94f0a5de33a459cab6af183a832327896d4d0f8f", "before": "440374faba56c41d4575bc1f2e9df81f7611c97a", "commits": [ { "added": [ "static/js/show-log.js" ], "author": { "email": "varmaa@gmail.com", "name": "Atul Varma", "username": "toolness" }, "committer": { "email": "varmaa@gmail.com", "name": "Atul Varma", "username": "toolness" }, "distinct": true, "id": "25b95f8b4eb1b596be2a9bfb32340249961c2335", "message": "Split out log-related code into js/show-log.js.", "modified": [ "static/index.html", "static/js/main.js" ], "removed": [], "timestamp": "2012-06-20T13:06:29-07:00", "url": "https://github.com/toolness/simplesauce/commit/25b95f8b4eb1b596be2a9bfb32340249961c2335" }, { "added": [ "underscore.js" ], "author": { "email": "varmaa@gmail.com", "name": "Atul Varma", "username": "toolness" }, "committer": { "email": "varmaa@gmail.com", "name": "Atul Varma", "username": "toolness" }, "distinct": true, "id": "03bbdedff0360584822ba2763cb322f6763d48f6", "message": "Use .simplesauce.json for per-project config.", "modified": [ "app.js", "webdriver-utils.js" ], "removed": [], "timestamp": "2012-06-20T13:31:02-07:00", "url": "https://github.com/toolness/simplesauce/commit/03bbdedff0360584822ba2763cb322f6763d48f6" }, { "added": [ ".simplesauce.json", "static/test/index.html", "static/test/qunit.css", "static/test/qunit.js" ], "author": { "email": "varmaa@gmail.com", "name": "Atul Varma", "username": "toolness" }, "committer": { "email": "varmaa@gmail.com", "name": "Atul Varma", "username": "toolness" }, "distinct": true, "id": "94f0a5de33a459cab6af183a832327896d4d0f8f", "message": "added simple qunit test suite", "modified": [], "removed": [], "timestamp": "2012-06-20T13:34:05-07:00", "url": "https://github.com/toolness/simplesauce/commit/94f0a5de33a459cab6af183a832327896d4d0f8f" } ], "compare": "https://github.com/toolness/simplesauce/compare/440374faba56...94f0a5de33a4", "created": false, "deleted": false, "forced": false, "head_commit": { "added": [ ".simplesauce.json", "static/test/index.html", "static/test/qunit.css", "static/test/qunit.js" ], "author": { "email": "varmaa@gmail.com", "name": "Atul Varma", "username": "toolness" }, "committer": { "email": "varmaa@gmail.com", "name": "Atul Varma", "username": "toolness" }, "distinct": true, "id": "94f0a5de33a459cab6af183a832327896d4d0f8f", "message": "added simple qunit test suite", "modified": [], "removed": [], "timestamp": "2012-06-20T13:34:05-07:00", "url": "https://github.com/toolness/simplesauce/commit/94f0a5de33a459cab6af183a832327896d4d0f8f" }, "pusher": { "name": "none" }, "ref": "refs/heads/master", "repository": { "created_at": "2012-06-18T07:20:20-07:00", "description": "Simple webdriver/saucelabs CI for static HTML5 projects.", "fork": false, "forks": 1, "has_downloads": true, "has_issues": true, "has_wiki": true, "homepage": "http://sauce.toolness.org/", "language": "JavaScript", "name": "simplesauce", "open_issues": 1, "owner": { "email": "varmaa@gmail.com", "name": "toolness" }, "private": false, "pushed_at": "2012-06-20T13:34:52-07:00", "size": 240, "url": "https://github.com/toolness/simplesauce", "watchers": 1 } })};

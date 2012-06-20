@@ -51,7 +51,7 @@ function updateSauceJob(sauce, sessionID, json) {
 
 exports.runTests = function runTests(subdirname, desired, cb, testPath) {
   var desired = JSON.parse(JSON.stringify(desired));
-  var baseurl = config.baseURL + "/" + subdirname + (testPath || "/test/"),
+  var baseurl = config.baseURL + "/" + subdirname + testPath,
       url = baseurl + '?externalreporter=1',
       browser;
 

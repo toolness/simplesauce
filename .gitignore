@@ -1,4 +1,4 @@
 node_modules
-static/log.json
+static/log*.json
 static/trees
 config.js

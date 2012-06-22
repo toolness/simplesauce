@@ -88,6 +88,7 @@ app.post(config.postReceiveEndpoint, function(req, res) {
         webdriverUtils.runTests({
           desiredCapabilities: desired,
           subdirectoryName: subdirname,
+          logFilename: staticFilesDir + '/log-session-{{sessionID}}.json',
           testPath: projectConfig.testPath
         }, function(err, result) {
           app.activeJobs--;
@@ -119,7 +120,7 @@ app.get('/externalreporter.js', function(req, res) {
 });
 
 app.use(function(req, res, next) {
-  if (req.url.indexOf('/log.json') == 0)
+  if (req.url.match(/^\/log.*\.json$/))
     res.header('Access-Control-Allow-Origin', '*');
   next();
 });

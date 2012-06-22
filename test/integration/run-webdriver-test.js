@@ -24,20 +24,28 @@ app.autoListen(function() {
     }
   };
   
-  webdriverUtils.runTests(subdirname, desired, function(err, info) {
+  function start(desired, cb) {
+    webdriverUtils.runTests({
+      desiredCapabilities: desired,
+      subdirectoryName: subdirname,
+      testPath: "/static/test/",
+    }, cb);
+  }
+  
+  start(desired, function(err, info) {
     assert(!err);
     assert.equal(info.result.passed, 1);
     assert.equal(info.result.failed, 0);
     //console.log(err, result);
     maybeQuit();
-  }, "/static/test/");
+  });
   
   desired.browserName = 'firefox';
-  webdriverUtils.runTests(subdirname, desired, function(err, info) {
+  start(desired, function(err, info) {
     assert(!err);
     assert.equal(info.result.passed, 1);
     assert.equal(info.result.failed, 0);
     //console.log(err, result);
     maybeQuit();
-  }, "/static/test/");
+  });
 });

@@ -85,10 +85,14 @@ app.post(config.postReceiveEndpoint, function(req, res) {
         app.emit('webdriver-session-starting', {
           capabilities: desired
         });
-        webdriverUtils.runTests(subdirname, desired, function(err, result) {
+        webdriverUtils.runTests({
+          desiredCapabilities: desired,
+          subdirectoryName: subdirname,
+          testPath: projectConfig.testPath
+        }, function(err, result) {
           app.activeJobs--;
           app.emit('webdriver-session-finished', result);
-        }, projectConfig.testPath);
+        });
       });
       res.send('started tests on ' + capabilities.length + ' browser(s).');
     } else {

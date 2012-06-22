@@ -5,7 +5,7 @@ var webdriver = require('wd'),
 
 const WEBDRIVER_CB_CODE = "window.WEBDRIVER_CB = " +
                           "arguments[arguments.length-1];";
-const MAX_LOG_ENTRIES = 2000;
+const MAX_LOG_ENTRIES = 5000;
 
 exports.getInjectionJS = function getInjectionJS() {
   return fs.readFileSync(__dirname + '/static/js/externalreporter.js',
@@ -96,9 +96,18 @@ exports.runTests = function runTests(options, cb) {
       sessionURL = 'https://saucelabs.com/jobs/' + sessionID;
 
     var logFilename = null;
-    if (baseLogFilename)
+    if (baseLogFilename) {
       logFilename = baseLogFilename.replace("{{sessionID}}", sessionID);
-
+      exports.updateLogFile(logFilename, MAX_LOG_ENTRIES, [{
+        type: "start",
+        value: {
+          sessionID: sessionID,
+          sessionURL: sessionURL,
+          capabilities: desired
+        }
+      }]);
+    }
+    
     console.log("session ID is", sessionID, "and URL is", sessionURL);
     browser.get(url, function(err) {
       if (err)

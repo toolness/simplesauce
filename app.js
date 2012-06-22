@@ -134,6 +134,8 @@ app.use(function(req, res, next) {
 
 app.use(express.static(staticFilesDir));
 
+app.DEFAULT_PROJECT_CONFIG = DEFAULT_PROJECT_CONFIG;
+
 module.exports = app;
 
 app.autoListen = function(cb) {

@@ -4,13 +4,12 @@
 (function() {
   var results = null;
 
-  QUnit.log = function(data) {
-    addResult({type: "log", value: data});
-  };
-  
-  QUnit.done = function(r) {
-    addResult({type: "done", value: r});
-  };
+  ["log", "testStart", "testDone", "moduleStart", "moduleDone",
+   "done"].forEach(function(type) {
+     QUnit[type] = function(value) {
+       addResult({type: type, value: value});
+     };
+  });
 
   function addResult(result) {
     if (!results)

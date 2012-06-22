@@ -83,14 +83,21 @@ exports.runTests = function runTests(subdirname, desired, cb, testPath) {
     browser.get(url, function(err) {
       if (err)
         return fail("could not load page at " + url);
-      browser.setAsyncScriptTimeout(30000, function(err) {
+      browser.setAsyncScriptTimeout(15000, function(err) {
         if (err)
           return fail("could not set async script timeout");
-        browser.executeAsync(WEBDRIVER_CB_CODE, [], function(err, result) {
-          if (err)
-            return fail("could not execute tests (or they timed out)");
-          result = JSON.parse(result);
-          console.log("browser.executeAsync() returned", err, result);
+          
+        function waitForResults(cb) {
+          browser.executeAsync(WEBDRIVER_CB_CODE, [], function(err, result) {
+            if (err)
+              return fail("could not execute tests (or they timed out)");
+            console.log("browser.executeAsync() returned", err, result);
+            result = JSON.parse(result);
+            cb(result);
+          });
+        }
+
+        function onDone(result) {
           desired.passed = (result.failed == 0);
           Object.keys(result).forEach(function(name) {
             desired['custom-data']['tests-' + name] = result[name];
@@ -104,7 +111,23 @@ exports.runTests = function runTests(subdirname, desired, cb, testPath) {
             result: result
           });
           browser.quit();
-        });
+        }
+        
+        function getMoreResults(results) {
+          var areWeDoneYet = false;
+          results.forEach(function(result) {
+            if (result.type == "done") {
+              areWeDoneYet = true;
+              onDone(result.value);
+            }
+            // TODO: It'd be nice to process the log message and save
+            // it to a file for further perusal.
+          });
+          if (!areWeDoneYet)
+            waitForResults(getMoreResults);
+        }
+        
+        waitForResults(getMoreResults);
       });
     });
   });

@@ -4,15 +4,30 @@
 (function() {
   var results = null;
 
+  QUnit.log = function(data) {
+    addResult({type: "log", value: data});
+  };
+  
   QUnit.done = function(r) {
-    results = r;
-    maybeFinish();
+    addResult({type: "done", value: r});
   };
 
+  function addResult(result) {
+    if (!results)
+      results = [];
+    results.push(result);
+    maybeFinish();
+  }
+  
   function maybeFinish() {
     if (results && window.WEBDRIVER_CB) {
-      clearInterval(interval);
-      window.WEBDRIVER_CB(JSON.stringify(results));
+      var arg = results,
+          cb = window.WEBDRIVER_CB;
+      delete window.WEBDRIVER_CB;
+      results = null;
+      if (arg[arg.length-1].type == "done")
+        clearInterval(interval);
+      cb(JSON.stringify(arg));
     }
   }
 

@@ -5,11 +5,24 @@ var webdriver = require('wd'),
 
 const WEBDRIVER_CB_CODE = "window.WEBDRIVER_CB = " +
                           "arguments[arguments.length-1];";
+const MAX_LOG_ENTRIES = 2000;
 
 exports.getInjectionJS = function getInjectionJS() {
   return fs.readFileSync(__dirname + '/static/js/externalreporter.js',
                          'utf8');
 }
+
+exports.updateLogFile = function(logfile, maxEntries, entries) {
+  var log;
+  try {
+    log = JSON.parse(fs.readFileSync(logfile));
+  } catch (e) {
+    log = {entries: []};
+  }
+  log.entries.unshift.apply(log.entries, entries);
+  log.entries = log.entries.slice(0, maxEntries);
+  fs.writeFileSync(logfile, JSON.stringify(log));
+};
 
 function updateSauceJob(sauce, sessionID, json) {
   var payload = JSON.stringify(json);
@@ -35,6 +48,7 @@ function updateSauceJob(sauce, sessionID, json) {
 
 exports.runTests = function runTests(options, cb) {
   var subdirname = options.subdirectoryName,
+      baseLogFilename = options.logFilename,
       desired = JSON.parse(JSON.stringify(options.desiredCapabilities)),
       baseurl = config.baseURL + "/" + subdirname + options.testPath,
       url = baseurl + '?externalreporter=1',
@@ -80,6 +94,11 @@ exports.runTests = function runTests(options, cb) {
       
     if (config.sauce)
       sessionURL = 'https://saucelabs.com/jobs/' + sessionID;
+
+    var logFilename = null;
+    if (baseLogFilename)
+      logFilename = baseLogFilename.replace("{{sessionID}}", sessionID);
+
     console.log("session ID is", sessionID, "and URL is", sessionURL);
     browser.get(url, function(err) {
       if (err)
@@ -124,6 +143,9 @@ exports.runTests = function runTests(options, cb) {
             // TODO: It'd be nice to process the log message and save
             // it to a file for further perusal.
           });
+          results.reverse();
+          if (logFilename)
+            exports.updateLogFile(logFilename, MAX_LOG_ENTRIES, results);
           if (!areWeDoneYet)
             waitForResults(getMoreResults);
         }

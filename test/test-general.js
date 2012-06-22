@@ -1,4 +1,5 @@
-var assert = require('assert');
+var assert = require('assert'),
+    fs = require('fs');
 
 describe('config', function() {
   var config = require('../config');
@@ -11,6 +12,41 @@ describe('config', function() {
 describe('app', function() {
   it('should be importable', function() {
     require('../app');
+  });
+});
+
+describe('webdriver-utils.updateLogFile()', function() {
+  var updateLogFile = require('../webdriver-utils').updateLogFile;
+  var logFilename = __dirname + '/testlog.json';
+  
+  function deleteLogFile() {
+    try {
+      fs.unlinkSync(logFilename);
+    } catch (e) {}
+  }
+  
+  function getLog() {
+    return JSON.parse(fs.readFileSync(logFilename, "utf8"));
+  }
+  
+  beforeEach(deleteLogFile);
+  afterEach(deleteLogFile);
+  
+  it('should write to a JSON file', function() {
+    updateLogFile(logFilename, 2, [1, 2]);
+    assert.deepEqual(getLog().entries, [1, 2]);
+  });
+
+  it('should push new entries to the front', function() {
+    updateLogFile(logFilename, 4, [1, 2]);
+    updateLogFile(logFilename, 4, [3, 4]);
+    assert.deepEqual(getLog().entries, [3, 4, 1, 2]);
+  });
+
+  it('should cull out old entries in the back', function() {
+    updateLogFile(logFilename, 3, [1, 2]);
+    updateLogFile(logFilename, 3, [3, 4]);
+    assert.deepEqual(getLog().entries, [3, 4, 1]);
   });
 });
 

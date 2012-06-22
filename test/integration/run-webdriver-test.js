@@ -7,6 +7,7 @@ var config = require('../../config'),
 
 const DEFAULT_SUBDIRNAME = 'trees/toolness-simplesauce-94f0a5de33a459cab6af183a832327896d4d0f8f';
 var subdirname = DEFAULT_SUBDIRNAME;
+var absSubdirname = null;
 var testPath = app.DEFAULT_PROJECT_CONFIG.testPath;
 
 (function processCmdLineArgs() {
@@ -17,20 +18,22 @@ var testPath = app.DEFAULT_PROJECT_CONFIG.testPath;
       subdirname = 'trees/' + subdirMatch[1];
   }
 
-  var absPath = path.normalize(__dirname + '/../../static/' + subdirname);
+  absSubdirname = path.normalize(__dirname + '/../../static/' + subdirname);
 
   try {
-    fs.statSync(absPath);
+    fs.statSync(absSubdirname);
   } catch (e) {
-    console.log('Subdirectory does not exist: ' + absPath);
+    console.log('Subdirectory does not exist: ' + absSubdirname);
     console.log("Please provide a valid one through the command line.");
     process.exit(1);
   }
-  
+
+  var config = "{}";
   try {
-    var config = JSON.parse(fs.readFileSync(absPath + '/.simplesauce.json'));
-    testPath = config.testPath || testPath;
+    config = fs.readFileSync(absSubdirname + '/.simplesauce.json');
   } catch (e) {}
+  config = JSON.parse(config);
+  testPath = config.testPath || testPath;
 })();
 
 app.autoListen(function() {
@@ -58,6 +61,7 @@ app.autoListen(function() {
       desiredCapabilities: desired,
       subdirectoryName: subdirname,
       testPath: testPath,
+      logFilename: absSubdirname + "/log-{{sessionID}}.json"
     }, cb);
   }
   

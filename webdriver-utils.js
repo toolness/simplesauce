@@ -1,30 +1,14 @@
 var webdriver = require('wd'),
     config = require('./config'),
-    http = require('http');
+    http = require('http'),
+    fs = require('fs');
 
 const WEBDRIVER_CB_CODE = "window.WEBDRIVER_CB = " +
                           "arguments[arguments.length-1];";
 
 exports.getInjectionJS = function getInjectionJS() {
-  function injectReporter() {
-    var results = null;
-    
-    QUnit.done = function(r) {
-      results = r;
-      maybeFinish();
-    };
-    
-    function maybeFinish() {
-      if (results && window.WEBDRIVER_CB) {
-        clearInterval(interval);
-        window.WEBDRIVER_CB(JSON.stringify(results));
-      }
-    }
-    
-    var interval = setInterval(maybeFinish, 10);
-  }
-  
-  return '(' + injectReporter + ')();';
+  return fs.readFileSync(__dirname + '/static/js/externalreporter.js',
+                         'utf8');
 }
 
 function updateSauceJob(sauce, sessionID, json) {

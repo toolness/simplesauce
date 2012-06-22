@@ -13,3 +13,21 @@ describe('app', function() {
     require('../app');
   });
 });
+
+describe('webdriver-utils.getInjectionJS()', function() {
+  var wdu = require('../webdriver-utils');
+  
+  it('should return a string', function() {
+    var js = wdu.getInjectionJS();
+    
+    assert.equal(typeof(js), "string");
+  });
+  
+  it('should be valid JS', function() {
+    var vm = require('vm');
+    vm.runInNewContext(wdu.getInjectionJS(), {
+      QUnit: {},
+      setInterval: function() {}
+    }, 'externalreporter.js');
+  });
+});
